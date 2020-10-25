@@ -47,5 +47,8 @@ Vagrant.configure("2") do |config|
                 echo "toor" | sudo passwd root --stdin
                 SHELL
           end
+          config.vm.provision "ansible" do |ansible|
+            ansible.playbook = "playbook.yml"
+          end
   end
 end
