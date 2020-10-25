@@ -5,64 +5,81 @@
   - name: Install nginx and additional
     yum:
       name:
-        - nginx
         - net-tools
         - nano
         - vim
         - tcpdump
+        - epel-release
+        - lynx
+        - policycoreutils-python
       state: present
-  
+
+  - name: NGINX | Install NGINX package from EPEL Repo
+    yum:
+      name: nginx
+      state: latest
+    
   - name: NGINX | Create NGINX config file from template
     template:
       src: nginx.conf.j2
       dest: /etc/nginx/nginx.conf
-    notify:
-    - reload nginx
+
+  - name: cp index
+    template:
+      src: index.j2
+      dest: /usr/share/nginx/html/index.html
+    notify: restart nginx
     
-  - name: selinux /etc/named/
-    sefcontext:
-      target: '/etc/named(/.*)?'
-      setype: named_zone_t
-      state: present
-      reload: yes
-    register: selinux
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
     
-  - name: apply  file context 
-    shell: |
-      restorecon -Rv /etc/named
-    when: selinux.changed
-    
-    
-  - name: ensure named is running and enabled
-    service: name=named state=restarted enabled=yes
+    - name: reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
 
     
 - hosts: rsyslog
   become: yes
   tasks:
- 
- 
-  - name: copy named.conf
-    copy: src=slave-named.conf dest=/etc/named.conf owner=root group=named mode=0640
-  - name: copy resolv.conf to the servers
-    copy: src=servers-resolv.conf dest=/etc/resolv.conf owner=root group=root mode=0644
-
-  - name: set /etc/named permissions
-    file: path=/etc/named owner=root group=named mode=0670
-
-  - name: selinux /etc/named/
-    sefcontext:
-      target: '/etc/named(/.*)?'
-      setype: named_zone_t
+  - name:
+    yum:
+      name:
+        - net-tools
+        - nano
+        - vim
+        - tcpdump
+        - epel-release
+        - lynx
+        - policycoreutils-python
       state: present
-      reload: yes
-    register: selinux
+ 
+ 
+  #- name: copy named.conf
+  #  copy: src=slave-named.conf dest=/etc/named.conf owner=root group=named mode=0640
+  #- name: copy resolv.conf to the servers
+  #  copy: src=servers-resolv.conf dest=/etc/resolv.conf owner=root group=root mode=0644
+
+  #- name: set /etc/named permissions
+  #  file: path=/etc/named owner=root group=named mode=0670
+
+  #- name: selinux /etc/named/
+  #  sefcontext:
+  #    target: '/etc/named(/.*)?'
+  #    setype: named_zone_t
+  #    state: present
+  #    reload: yes
+  #  register: selinux
     
-  - name: apply  file context 
-    shell: |
-      restorecon -Rv /etc/named
-    when: selinux.changed
+  #- name: apply  file context 
+  #  shell: |
+  #    restorecon -Rv /etc/named
+  #  when: selinux.changed
     
     
-  - name: ensure named is running and enabled
-    service: name=named state=restarted enabled=yes
+  #- name: ensure named is running and enabled
+  #  service: name=named state=restarted enabled=yes
