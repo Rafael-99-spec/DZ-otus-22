@@ -49,25 +49,6 @@
       dest: /etc/rsyslog.d/listen.conf
     notify: restart rsyslog
     
-  handlers:
-    - name: restart nginx
-      systemd:
-        name: nginx
-        state: restarted
-        enabled: yes
-        
-    - name: restart rsyslog
-      systemd:
-        name: rsyslog
-        state: restarted
-        enabled: yes
-    
-    - name: reload nginx
-      systemd:
-        name: nginx
-        state: reloaded
-        
-    
 - hosts: rsyslog
   become: yes
   tasks:
@@ -84,6 +65,30 @@
         - rsyslog
         - chrony
       state: present
+      
+  - name: cp rsyslog.conf
+    template:
+      src: rsyslog.conf_rsyslog.j2
+      dest: /etc/rsyslog.d/rsyslog.conf
+    notify: restart rsyslog
+      
+    handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+        
+    - name: restart rsyslog
+      systemd:
+        name: rsyslog
+        state: restarted
+        enabled: yes
+    
+    - name: reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
  
  
   #- name: copy named.conf
