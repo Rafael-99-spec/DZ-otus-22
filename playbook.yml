@@ -12,6 +12,7 @@
         - epel-release
         - lynx
         - policycoreutils-python
+        - rsyslog
       state: present
 
   - name: NGINX | Install NGINX package from EPEL Repo
@@ -56,6 +57,7 @@
         - epel-release
         - lynx
         - policycoreutils-python
+        - rsyslog
       state: present
  
  
