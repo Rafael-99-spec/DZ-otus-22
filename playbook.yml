@@ -2,6 +2,11 @@
 - hosts: webserver
   become: yes
   tasks:
+  - name: Install EPEL Repo
+    yum:
+      name: epel-release
+      state: latest
+
   - name: Install nginx and additional
     yum:
       name:
@@ -9,7 +14,6 @@
         - nano
         - vim
         - tcpdump
-        - epel-release
         - lynx
         - policycoreutils-python
         - rsyslog
@@ -48,10 +52,34 @@
       src: listen.conf_webserver.j2
       dest: /etc/rsyslog.d/listen.conf
     notify: restart rsyslog
+
+  handlers:
+  - name: restart nginx
+    systemd:
+      name: nginx
+      state: restarted
+      enabled: yes
+        
+  - name: restart rsyslog
+    systemd:
+      name: rsyslog
+      state: restarted
+      enabled: yes
+    
+  - name: reload nginx
+    systemd:
+      name: nginx
+      state: reloaded
     
 - hosts: rsyslog
   become: yes
   tasks:
+  
+  - name: Install EPEL Repo
+    yum:
+      name: epel-release
+      state: latest
+  
   - name:
     yum:
       name:
@@ -59,7 +87,6 @@
         - nano
         - vim
         - tcpdump
-        - epel-release
         - lynx
         - policycoreutils-python
         - rsyslog
@@ -72,46 +99,20 @@
       dest: /etc/rsyslog.d/rsyslog.conf
     notify: restart rsyslog
       
-    handlers:
-    - name: restart nginx
-      systemd:
-        name: nginx
-        state: restarted
-        enabled: yes
+  handlers:
+  - name: restart nginx
+    systemd:
+      name: nginx
+      state: restarted
+      enabled: yes
         
-    - name: restart rsyslog
-      systemd:
-        name: rsyslog
-        state: restarted
-        enabled: yes
+  - name: restart rsyslog
+    systemd:
+      name: rsyslog
+      state: restarted
+      enabled: yes
     
-    - name: reload nginx
-      systemd:
-        name: nginx
-        state: reloaded
- 
- 
-  #- name: copy named.conf
-  #  copy: src=slave-named.conf dest=/etc/named.conf owner=root group=named mode=0640
-  #- name: copy resolv.conf to the servers
-  #  copy: src=servers-resolv.conf dest=/etc/resolv.conf owner=root group=root mode=0644
-
-  #- name: set /etc/named permissions
-  #  file: path=/etc/named owner=root group=named mode=0670
-
-  #- name: selinux /etc/named/
-  #  sefcontext:
-  #    target: '/etc/named(/.*)?'
-  #    setype: named_zone_t
-  #    state: present
-  #    reload: yes
-  #  register: selinux
-    
-  #- name: apply  file context 
-  #  shell: |
-  #    restorecon -Rv /etc/named
-  #  when: selinux.changed
-    
-    
-  #- name: ensure named is running and enabled
-  #  service: name=named state=restarted enabled=yes
+  - name: reload nginx
+    systemd:
+      name: nginx
+      state: reloaded
