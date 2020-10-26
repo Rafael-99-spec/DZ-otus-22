@@ -45,6 +45,7 @@ Vagrant.configure("2") do |config|
                 rsyslog.vm.provision "shell", inline: <<-SHELL
                 mkdir -p ~root/.ssh; cp ~vagrant/.ssh/auth* ~root/.ssh
                 echo "toor" | sudo passwd root --stdin
+                cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime
                 SHELL
           end
           config.vm.provision "ansible" do |ansible|

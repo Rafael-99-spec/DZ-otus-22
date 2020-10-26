@@ -53,6 +53,15 @@
       dest: /etc/rsyslog.d/listen.conf
     notify: restart rsyslog
 
+  - name: cp rsyslog.conf
+    template:
+      src: rsyslog.conf_webserver.j2
+      dest: /etc/rsyslog.conf
+    notify: restart rsyslog  
+  
+  - name: restart nginx
+    notify: restart nginx
+
   handlers:
   - name: restart nginx
     systemd:
@@ -98,6 +107,20 @@
       src: rsyslog.conf_rsyslog.j2
       dest: /etc/rsyslog.d/rsyslog.conf
     notify: restart rsyslog
+
+  - name: Allow rsyslog to listen on tcp port 514
+    seport:
+      ports: 514
+      proto: tcp
+      setype: syslogd_port_t
+      state: present
+
+  - name: Allow rsyslog to listen on udp port 514
+    seport:
+      ports: 514
+      proto: udp
+      setype: syslogd_port_t
+      state: present
       
   handlers:
   - name: restart nginx
