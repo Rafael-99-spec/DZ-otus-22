@@ -13,6 +13,7 @@
         - lynx
         - policycoreutils-python
         - rsyslog
+        - chrony
       state: present
 
   - name: NGINX | Install NGINX package from EPEL Repo
@@ -31,10 +32,34 @@
       dest: /usr/share/nginx/html/index.html
     notify: restart nginx
     
+  - name: cp all.conf
+    template:
+      src: all.conf_webserver.j2
+      dest: /etc/rsyslog.d/all.conf
+    notify: restart rsyslog
+
+  - name: cp errors.conf
+    template:
+      src: errors.conf_webserver.j2
+      dest: /etc/rsyslog.d/errors.conf
+    notify: restart rsyslog
+    
+  - name: cp listen.conf
+    template:
+      src: listen.conf_webserver.j2
+      dest: /etc/rsyslog.d/listen.conf
+    notify: restart rsyslog
+    
   handlers:
     - name: restart nginx
       systemd:
         name: nginx
+        state: restarted
+        enabled: yes
+        
+    - name: restart rsyslog
+      systemd:
+        name: rsyslog
         state: restarted
         enabled: yes
     
@@ -42,7 +67,7 @@
       systemd:
         name: nginx
         state: reloaded
-
+        
     
 - hosts: rsyslog
   become: yes
