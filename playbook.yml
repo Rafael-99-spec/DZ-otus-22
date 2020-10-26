@@ -13,7 +13,6 @@
         - lynx
         - policycoreutils-python
         - rsyslog
-        - chrony
       state: present
 
   - name: NGINX | Install NGINX package from EPEL Repo
@@ -83,6 +82,7 @@
         - lynx
         - policycoreutils-python
         - rsyslog
+        - chrony
       state: present
  
  
