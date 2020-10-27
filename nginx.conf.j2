@@ -6,7 +6,8 @@ events {
 http {
       	access_log syslog:server=192.168.11.102:514;
         error_log syslog:server=192.168.11.102:514;
-        error_log  /var/log/nginx/error.log;
+	access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
     server {
 	listen      80;
         server_name  default_server;
