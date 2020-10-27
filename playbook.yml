@@ -58,9 +58,6 @@
       src: rsyslog.conf_webserver.j2
       dest: /etc/rsyslog.conf
     notify: restart rsyslog  
-  
-  - name: restart nginx
-    notify: restart nginx
 
   handlers:
   - name: restart nginx
